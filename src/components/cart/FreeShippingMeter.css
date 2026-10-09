@@ -1,0 +1,47 @@
+.shipping-meter {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.shipping-meter-header {
+  margin-bottom: var(--space-xs);
+}
+
+.shipping-meter-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.shipping-meter-status.unlocked {
+  color: var(--accent-green);
+  font-weight: 500;
+}
+
+.shipping-meter-status.pending strong {
+  color: var(--text-primary);
+}
+
+.shipping-meter-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.shipping-meter-fill {
+  height: 100%;
+  background-color: var(--accent-taupe);
+  transition: width var(--transition-slow);
+}
+
+.shipping-meter-fill.is-complete {
+  background-color: var(--accent-green);
+}
+

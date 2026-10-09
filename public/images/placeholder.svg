@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+  <defs>
+    <linearGradient id="an-placeholder-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FAF8F5"/>
+      <stop offset="50%" stop-color="#F2EDE6"/>
+      <stop offset="100%" stop-color="#E8E2D8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#an-placeholder-grad)"/>
+  <rect x="40" y="40" width="720" height="920" fill="none" stroke="#D9D2C7" stroke-width="1"/>
+  <circle cx="400" cy="460" r="44" fill="none" stroke="#A39A8E" stroke-width="1.5" stroke-dasharray="2 3"/>
+  <path d="M380 470 L395 450 L408 465 L420 445 L435 470 Z" fill="#B5ADA2"/>
+  <text x="400" y="540" font-family="'Cormorant Garamond', Georgia, serif" font-size="28" fill="#2E2B27" text-anchor="middle" letter-spacing="4" font-weight="500">ATELIER NORD</text>
+  <text x="400" y="575" font-family="'Inter', -apple-system, sans-serif" font-size="12" fill="#8C8478" text-anchor="middle" letter-spacing="2">IMAGE ARCHIVE</text>
+</svg>

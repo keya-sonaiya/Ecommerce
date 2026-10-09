@@ -1,0 +1,62 @@
+.quantity-selector {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  user-select: none;
+}
+
+.quantity-selector.size-sm {
+  height: 32px;
+}
+
+.quantity-selector.size-md {
+  height: 42px;
+}
+
+.qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 100%;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  transition: background-color var(--transition-fast);
+}
+
+.qty-btn:hover:not(:disabled) {
+  background-color: var(--bg-secondary);
+}
+
+.qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.qty-input {
+  width: 44px;
+  height: 100%;
+  border: none;
+  text-align: center;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: transparent;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.qty-input:focus {
+  outline: none;
+}
+

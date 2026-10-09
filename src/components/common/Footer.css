@@ -1,0 +1,133 @@
+.site-footer {
+  background-color: var(--bg-accent);
+  color: #CFC9C2;
+  padding-top: var(--space-3xl);
+  margin-top: auto;
+  border-top: 1px solid #383431;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-3xl);
+}
+
+@media (min-width: 640px) {
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-container {
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: var(--space-2xl);
+  }
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.footer-brand-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  letter-spacing: 0.12em;
+  color: var(--bg-primary);
+  text-transform: uppercase;
+}
+
+.footer-description {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #B5AEA6;
+  max-width: 380px;
+}
+
+.footer-location {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-taupe);
+  margin-top: var(--space-xs);
+}
+
+.footer-heading {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bg-primary);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.footer-links a {
+  font-size: 0.875rem;
+  color: #B5AEA6;
+  transition: color var(--transition-fast);
+}
+
+.footer-links a:hover {
+  color: var(--bg-primary);
+}
+
+.footer-subtext {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #B5AEA6;
+}
+
+.footer-static-text {
+  font-size: 0.825rem;
+  line-height: 1.65;
+  color: #B5AEA6;
+  margin: 0;
+}
+
+.footer-bottom {
+  border-top: 1px solid #383431;
+  padding: var(--space-lg) 0;
+  font-size: 0.75rem;
+  color: #8A837C;
+}
+
+.footer-bottom-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (min-width: 640px) {
+  .footer-bottom-inner {
+    flex-direction: row;
+  }
+}
+
+.copyright-text {
+  color: #8A837C;
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.footer-badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--accent-taupe);
+  border: 1px solid #443F3B;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
