@@ -7,6 +7,7 @@ import { getProductsByTag } from '../data/products.js';
 import { categories } from '../data/categories.js';
 import { siteImages } from '../data/siteImages.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { trackClickCta } from '../analytics/dataLayer.js';
 import './Home.css';
 
 export function Home() {
@@ -41,10 +42,12 @@ export function Home() {
               and purposeful tailoring crafted for daily permanence.
             </p>
             <div className="hero-cta-group">
-              <Link to="/shop" className="hero-btn">
+              <Link to="/shop" className="hero-btn"
+                onClick={() => trackClickCta('Explore The Collection', 'home_hero')}>
                 Explore The Collection <ArrowRight size={16} />
               </Link>
-              <Link to="/shop?sale=1" className="hero-sale-btn">
+              <Link to="/shop?sale=1" className="hero-sale-btn"
+                onClick={() => trackClickCta('Shop The Sale', 'home_hero')}>
                 Shop The Sale <Percent size={15} />
               </Link>
             </div>
@@ -135,7 +138,8 @@ export function Home() {
             </div>
           </div>
 
-          <ProductGrid products={featuredProducts} columns={4} />
+          <ProductGrid products={featuredProducts} columns={4}
+            listId="home_featured" listName="Home – Featured" />
         </div>
       </section>
 

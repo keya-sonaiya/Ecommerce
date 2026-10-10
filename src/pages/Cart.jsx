@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ShoppingBag, AlertCircle, X } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
@@ -7,6 +7,9 @@ import { FreeShippingMeter } from '../components/cart/FreeShippingMeter.jsx';
 import { CouponInput } from '../components/cart/CouponInput.jsx';
 import { formatPrice } from '../utils/formatPrice.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import {
+  trackViewCart, trackAddToCart, trackRemoveFromCart, trackUpdateCartQuantity,
+} from '../analytics/dataLayer.js';
 import './Cart.css';
 
 export function Cart() {
@@ -32,6 +35,32 @@ export function Cart() {
     updateQuantity,
     removeFromCart,
   } = useCart();
+
+  // view_cart: once per visit, only with items
+  const viewedCart = useRef(false);
+  useEffect(() => {
+    if (items.length > 0 && !viewedCart.current) {
+      viewedCart.current = true;
+      trackViewCart(items);
+    }
+  }, [items]);
+
+  const handleRemove = (lineKey) => {
+    const line = items.find((i) => i.lineKey === lineKey);
+    if (line) trackRemoveFromCart(line, line.quantity);
+    removeFromCart(lineKey);
+  };
+
+  // Quantity changes send only the DELTA
+  const handleQuantity = (lineKey, newQty) => {
+    const line = items.find((i) => i.lineKey === lineKey);
+    if (!line || newQty === line.quantity) return;
+    const delta = newQty - line.quantity;
+    if (delta > 0) trackAddToCart(line, delta);
+    else trackRemoveFromCart(line, -delta);
+    trackUpdateCartQuantity(line.id, delta > 0 ? 'increase' : 'decrease', newQty);
+    updateQuantity(lineKey, newQty);
+  };
 
   if (items.length === 0) {
     return (
@@ -97,8 +126,8 @@ export function Cart() {
                 <CartItem
                   key={item.lineKey}
                   item={item}
-                  onUpdateQuantity={updateQuantity}
-                  onRemove={removeFromCart}
+                  onUpdateQuantity={handleQuantity}
+                  onRemove={handleRemove}
                 />
               ))}
             </div>

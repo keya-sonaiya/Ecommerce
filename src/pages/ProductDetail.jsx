@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Check, ShieldCheck, Truck, RefreshCw, AlertCircle, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { getProductById, getProductsByCategory } from '../data/products.js';
@@ -10,6 +10,9 @@ import { useCart } from '../context/CartContext.jsx';
 import { formatPrice } from '../utils/formatPrice.js';
 import { getFinalUnitPrice } from '../utils/pricing.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import {
+  trackViewItem, trackAddToCart, trackSelectVariant, setUserProperties,
+} from '../analytics/dataLayer.js';
 import './ProductDetail.css';
 
 export function ProductDetail() {
@@ -36,6 +39,16 @@ export function ProductDetail() {
     setValidationError('');
     setAddedSuccessMessage('');
   }, [id]);
+
+  // view_item: once per product viewed (ref blocks the StrictMode double-run)
+  const lastViewed = useRef(null);
+  useEffect(() => {
+    if (!product || lastViewed.current === id) return;
+    lastViewed.current = id;
+    trackViewItem(product);
+    const cat = categories.find((c) => c.name === product.category);
+    if (cat) setUserProperties({ preferred_category: cat.slug });
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // If product not found
   if (!product) {
@@ -91,6 +104,7 @@ export function ProductDetail() {
 
     // Add to cart via central context action
     addToCart(product, selectedSize, selectedColor, quantity);
+    trackAddToCart(product, quantity, { size: selectedSize, color: selectedColor });
 
     // Show accessible confirmation message
     const variantDesc = [selectedSize, selectedColor].filter(Boolean).join(' / ');
@@ -212,6 +226,10 @@ export function ProductDetail() {
                       aria-checked={selectedSize === size}
                       className={`size-btn ${selectedSize === size ? 'active' : ''}`}
                       onClick={() => {
+                        if (selectedSize !== size) {
+                          trackSelectVariant('size', size, product.id);
+                          setUserProperties({ preferred_size: size });
+                        }
                         setSelectedSize(size);
                         setValidationError('');
                       }}
@@ -239,6 +257,7 @@ export function ProductDetail() {
                       aria-checked={selectedColor === color}
                       className={`color-btn ${selectedColor === color ? 'active' : ''}`}
                       onClick={() => {
+                        if (selectedColor !== color) trackSelectVariant('colour', color, product.id);
                         setSelectedColor(color);
                         setValidationError('');
                       }}

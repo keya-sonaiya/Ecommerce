@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { FallbackImage } from '../common/FallbackImage.jsx';
 import { formatPrice } from '../../utils/formatPrice.js';
 import { getFinalUnitPrice } from '../../utils/pricing.js';
+import { trackSelectItem } from '../../analytics/dataLayer.js';
 import './ProductCard.css';
 
-export function ProductCard({ product, showCategory = true }) {
+export function ProductCard({ product, showCategory = true, index, listId, listName }) {
   if (!product) return null;
 
   const finalPrice = getFinalUnitPrice(product);
@@ -17,7 +18,11 @@ export function ProductCard({ product, showCategory = true }) {
       className="product-card"
       data-testid={`product-card-${product.id}`}
     >
-      <Link to={`/product/${product.id}`} className="product-card-link">
+      <Link
+        to={`/product/${product.id}`}
+        className="product-card-link"
+        onClick={() => { if (listId) trackSelectItem(product, index, listId, listName); }}
+      >
         <div className="product-card-media">
           <FallbackImage
             src={product.image}

@@ -11,6 +11,7 @@ export function FallbackImage({
   className = '',
   loading = 'lazy',
   style = {},
+  productName, // accepted but not passed to the DOM
   ...rest
 }) {
   const [hasError, setHasError] = useState(false);

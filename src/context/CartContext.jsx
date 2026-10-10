@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { cartReducer, initialCartState, CART_ACTION_TYPES } from './cartReducer.js';
 import { getFromStorage, setToStorage, CART_STORAGE_KEY, ORDER_STORAGE_KEY } from '../utils/storage.js';
 import { createCompletedOrder } from '../utils/orderGenerator.js';
 import { getCoupon } from '../data/coupons.js';
+import { FREE_SHIPPING_THRESHOLD } from '../utils/pricing.js';
+import { trackFreeShippingUnlocked } from '../analytics/dataLayer.js';
 
 const CartContext = createContext(null);
 
@@ -30,6 +32,16 @@ export function CartProvider({ children }) {
       couponCode: state.couponCode,
     });
   }, [state.items, state.shippingMethod, state.couponCode]);
+
+  // free_shipping_unlocked: fires only when the cart crosses the threshold upwards
+  const prevSubtotal = useRef(state.discountedSubtotal);
+  useEffect(() => {
+    const prev = prevSubtotal.current;
+    if (prev < FREE_SHIPPING_THRESHOLD && state.discountedSubtotal >= FREE_SHIPPING_THRESHOLD) {
+      trackFreeShippingUnlocked(state.discountedSubtotal);
+    }
+    prevSubtotal.current = state.discountedSubtotal;
+  }, [state.discountedSubtotal]);
 
   // Central Cart Actions
   const addToCart = (product, size = '', color = '', quantity = 1) => {

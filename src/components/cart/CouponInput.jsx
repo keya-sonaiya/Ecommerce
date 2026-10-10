@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Tag, Check, X, AlertCircle } from 'lucide-react';
 import { useCart } from '../../context/CartContext.jsx';
 import { formatPrice } from '../../utils/formatPrice.js';
+import { getCoupon } from '../../data/coupons.js';
+import { calculateCartTotals } from '../../utils/pricing.js';
+import { trackApplyCoupon, trackCouponError } from '../../analytics/dataLayer.js';
 import './CouponInput.css';
 
 export function CouponInput({ className = '' }) {
-  const { couponCode, couponDiscount, couponError, applyCoupon, removeCoupon } = useCart();
+  const { items, shippingMethod, couponCode, couponDiscount, couponError, applyCoupon, removeCoupon } = useCart();
   const [inputVal, setInputVal] = useState('');
   const [localError, setLocalError] = useState('');
 
@@ -14,13 +17,18 @@ export function CouponInput({ className = '' }) {
     setLocalError('');
     const code = inputVal.trim();
     if (!code) {
+      trackCouponError('', 'empty');
       setLocalError('Please enter a coupon code');
       return;
     }
     const result = applyCoupon(code);
     if (!result.success) {
+      // known code but too small a cart = minimum_not_met; anything else = invalid
+      trackCouponError(code, getCoupon(code) ? 'minimum_not_met' : 'invalid');
       setLocalError(result.error);
     } else {
+      const { couponDiscount: amount } = calculateCartTotals(items, shippingMethod, code);
+      trackApplyCoupon(code, amount);
       setInputVal('');
       setLocalError('');
     }

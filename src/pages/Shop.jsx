@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   SlidersHorizontal,
@@ -13,6 +13,9 @@ import { categories } from '../data/categories.js';
 import { getFinalUnitPrice } from '../utils/pricing.js';
 import { ProductGrid } from '../components/product/ProductGrid.jsx';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import {
+  trackFilterProducts, trackSortProducts, trackSearch, setUserProperties,
+} from '../analytics/dataLayer.js';
 import './Shop.css';
 
 export function Shop() {
@@ -52,6 +55,27 @@ export function Shop() {
   }, [categoryParam]);
 
   const isInvalidCategory = Boolean(categoryParam && !matchedCategory);
+
+  // Which list is on screen (used by view_item_list / select_item)
+  const { listId, listName } = useMemo(() => {
+    if (queryParam.trim()) return { listId: 'shop_search', listName: 'Shop – Search' }; // no user text in the name
+    if (matchedCategory) return { listId: `shop_category_${matchedCategory.slug}`, listName: `Shop – ${matchedCategory.name}` };
+    if (saleParam) return { listId: 'shop_sale', listName: 'Shop – Sale' };
+    return { listId: 'shop_all', listName: 'Shop – All' };
+  }, [queryParam, matchedCategory, saleParam]);
+
+  // filter_products: fires when a category or sale filter becomes active (sidebar, nav links, home tiles)
+  const lastFilter = useRef({ category: null, sale: false });
+  useEffect(() => {
+    const slug = matchedCategory ? matchedCategory.slug : null;
+    if (slug && lastFilter.current.category !== slug) {
+      trackFilterProducts('category', slug);
+      setUserProperties({ preferred_category: slug });
+    }
+    lastFilter.current.category = slug;
+    if (saleParam && !lastFilter.current.sale) trackFilterProducts('sale', 'on');
+    lastFilter.current.sale = saleParam;
+  }, [matchedCategory, saleParam]);
 
   // Dynamic Page Title
   const pageTitle = useMemo(() => {
@@ -132,6 +156,7 @@ export function Shop() {
 
   // Update query params helper
   const updateParam = (key, value) => {
+    if (key === 'sort') trackSortProducts(value || 'featured');
     const next = new URLSearchParams(searchParams);
     if (!value || value === 'all' || value === 'featured') {
       next.delete(key);
@@ -143,6 +168,7 @@ export function Shop() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    trackSearch(searchInput);
     updateParam('q', searchInput.trim());
   };
 
@@ -415,7 +441,7 @@ export function Shop() {
           {/* Product Grid Area */}
           <div className="shop-grid-area">
             {filteredProducts.length > 0 ? (
-              <ProductGrid products={filteredProducts} columns={3} />
+              <ProductGrid products={filteredProducts} columns={3} listId={listId} listName={listName} />
             ) : (
               <div className="empty-results-state">
                 <h3 className="empty-title">No matching pieces found</h3>

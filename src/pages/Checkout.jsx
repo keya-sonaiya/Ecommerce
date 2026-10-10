@@ -23,12 +23,17 @@ import { CouponInput } from '../components/cart/CouponInput.jsx';
 import { formatPrice } from '../utils/formatPrice.js';
 import { getFromStorage, ORDER_STORAGE_KEY } from '../utils/storage.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import {
+  trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo, trackPurchase,
+  trackSelectShippingMethod, trackCheckoutError, trackVirtualPageView,
+} from '../analytics/dataLayer.js';
 import './Checkout.css';
 
 export function Checkout() {
   useDocumentTitle('Simulated Checkout — Atelier Nord');
 
   const {
+    cart,
     items,
     itemCount,
     itemsSubtotal,
@@ -74,6 +79,18 @@ export function Checkout() {
     state: useRef(null),
     postalCode: useRef(null),
   };
+
+  // ---- analytics guards ----
+  const trackedBegin = useRef(false);
+  const sentShipping = useRef(null);
+  const sentPayment = useRef(null);
+
+  // begin_checkout: once per entry to /checkout, only when the bag has items
+  useEffect(() => {
+    if (trackedBegin.current || items.length === 0) return;
+    trackedBegin.current = true;
+    trackBeginCheckout(items, cart);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll to top when changing steps
   useEffect(() => {
@@ -151,6 +168,7 @@ export function Checkout() {
       newErrors.postalCode = 'PIN code must be exactly 6 digits.';
     }
 
+    Object.keys(newErrors).forEach((field) => trackCheckoutError(field, 'details'));
     setErrors(newErrors);
 
     const firstInvalidField = Object.keys(newErrors)[0];
@@ -170,11 +188,20 @@ export function Checkout() {
 
   const handleContinueToPayment = (e) => {
     e.preventDefault();
+    const tier = shippingMethod === 'express' ? 'Express' : 'Standard';
+    if (sentShipping.current !== tier) {          // no repeat if they go back and resubmit unchanged
+      sentShipping.current = tier;
+      trackAddShippingInfo(items, cart, tier);
+    }
     setCurrentStep(3);
   };
 
   const handleContinueToReview = (e) => {
     e.preventDefault();
+    if (sentPayment.current !== formData.paymentMethod) {
+      sentPayment.current = formData.paymentMethod;
+      trackAddPaymentInfo(items, cart, formData.paymentMethod);
+    }
     setCurrentStep(4);
   };
 
@@ -200,6 +227,8 @@ export function Checkout() {
             postalCode: formData.postalCode.trim(),
           },
         });
+        trackVirtualPageView({ path: '/checkout', title: 'Order Confirmed' });
+        trackPurchase(orderResult);   // dedupes by transaction_id and never reads customer data
         setPlacedOrder(orderResult);
         setCurrentStep(5);
       } catch (err) {
@@ -666,7 +695,7 @@ export function Checkout() {
                         name="shippingOption"
                         value="standard"
                         checked={shippingMethod === 'standard'}
-                        onChange={() => setShippingMethod('standard')}
+                        onChange={() => { if (shippingMethod !== 'standard') trackSelectShippingMethod('Standard'); setShippingMethod('standard'); }}
                         className="sr-only"
                       />
                       <div className="shipping-option-icon">
@@ -692,7 +721,7 @@ export function Checkout() {
                         name="shippingOption"
                         value="express"
                         checked={shippingMethod === 'express'}
-                        onChange={() => setShippingMethod('express')}
+                        onChange={() => { if (shippingMethod !== 'express') trackSelectShippingMethod('Express'); setShippingMethod('express'); }}
                         className="sr-only"
                       />
                       <div className="shipping-option-icon">

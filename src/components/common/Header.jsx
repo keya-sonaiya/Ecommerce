@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
 import { useCart } from '../../context/CartContext.jsx';
 import { categories } from '../../data/categories.js';
+import { trackSearch, trackClickCta } from '../../analytics/dataLayer.js';
 import './Header.css';
 
 export function Header() {
@@ -59,6 +60,7 @@ export function Header() {
     e.preventDefault();
     const query = searchQuery.trim();
     if (query) {
+      trackSearch(query);
       navigate(`/shop?q=${encodeURIComponent(query)}`);
       setIsSearchOpen(false);
       setSearchQuery('');
@@ -170,6 +172,7 @@ export function Header() {
               <Link
                 to="/shop?sale=1"
                 className={`nav-link nav-link-sale ${isSaleActive ? 'active' : ''}`}
+                onClick={() => trackClickCta('Sale', 'header_nav')}
               >
                 Sale
               </Link>

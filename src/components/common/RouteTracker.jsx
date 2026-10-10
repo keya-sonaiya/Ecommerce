@@ -8,10 +8,11 @@ export default function RouteTracker() {
 
   useEffect(() => {
     if (lastPath.current === null) { lastPath.current = pathname; return; } // first load: Google tag sends it
-    if (lastPath.current === pathname) return; // blocks the StrictMode double-run
+    if (lastPath.current === pathname) return;                              // blocks StrictMode double-run
     lastPath.current = pathname;
     resetListSignature();
-    trackVirtualPageView({ path: pathname });
+    const t = setTimeout(() => trackVirtualPageView({ path: pathname }), 0); // wait for new page title
+    return () => clearTimeout(t);
   }, [pathname]);
 
   return null;
