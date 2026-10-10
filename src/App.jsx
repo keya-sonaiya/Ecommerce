@@ -4,6 +4,7 @@ import AnnouncementBar from './components/common/AnnouncementBar.jsx';
 import Header from './components/common/Header.jsx';
 import Footer from './components/common/Footer.jsx';
 import ScrollToTop from './components/common/ScrollToTop.jsx';
+import RouteTracker from './components/common/RouteTracker.jsx';
 
 // 5 Official Routes
 import Home from './pages/Home.jsx';
@@ -16,6 +17,7 @@ export function App() {
   return (
     <>
       <ScrollToTop />
+      <RouteTracker />
       <AnnouncementBar />
       <Header />
 

@@ -44,14 +44,10 @@ npm run preview
 # Serves the compiled dist/ directory at http://localhost:4173
 ```
 
-### Verification Scripts
-```bash
-# Verify all 36 local product and site image files
-npm run verify:images
+### Verification
 
-# Run unit tests asserting pricing calculation order and coupon allocation algorithms
-npm run test:pricing
-```
+The current repository does not include automated image or pricing verification scripts. Use
+`npm run build` as the available production validation command until those checks are restored.
 
 ### Deploy to Vercel
 
@@ -84,20 +80,12 @@ No environment variables are required by the current demo application.
 atelier-nord/
 ├── docs/
 │   ├── CHALLENGES.md           # Engineering challenges, decisions, and mitigations
-│   ├── IMAGE_CREDITS.md        # Full attribution table for all 36 Unsplash photographs
-│   ├── IMPROVEMENTS.md         # Planned future roadmap
-│   ├── REQUIREMENTS.md         # Scope and business requirements
-│   ├── TEST_CASES.md           # QA test suite and validation matrices
-│   └── TRACKING_PLAN.md        # Event schema documentation for subsequent analytics phase
 ├── public/
 │   ├── images/
 │   │   ├── products/            # Local product photography
 │   │   ├── site/                # Local hero and category photography
 │   │   └── placeholder.svg      # Brand ivory/taupe vector fallback placeholder
 │   └── favicon.svg             # Minimalist AN monogram favicon
-├── scripts/
-│   ├── test-pricing.mjs        # Reference checks for pricing & coupon allocation
-│   └── verify-images.mjs       # Remote image HTTP 200 verification script
 ├── src/
 │   ├── components/
 │   │   ├── cart/
@@ -120,9 +108,9 @@ atelier-nord/
 │   ├── data/
 │   │   ├── categories.js       # The 6 official categories + accessory subcategories
 │   │   ├── coupons.js          # WELCOME10, NORD500, FREESHIP
-│   │   ├── productImages.js    # Single source mapping 28 product IDs to remote 4:5 URLs
+│   │   ├── productImages.js    # Single source mapping 28 product IDs to local 4:5 paths
 │   │   ├── products.js         # Single source of truth: 28 products with permanent IDs
-│   │   └── siteImages.js       # Hero, editorial, and category tile remote URLs
+│   │   └── siteImages.js        # Hero, editorial, and category tile local paths
 │   ├── hooks/
 │   │   └── useDocumentTitle.js # Centralized document.title updater
 │   ├── pages/
@@ -199,8 +187,8 @@ In strict adherence to PROJECT_TASK.md Section 5.4, all images are stored and se
 - **Centralized Mapping:** [`src/data/productImages.js`](src/data/productImages.js) and [`src/data/siteImages.js`](src/data/siteImages.js) provide clean centralized mapping functions.
 - **Aspect Ratio & Layout Stability:** Every image container enforces a fixed 4:5 ratio (`aspect-ratio: 4/5; object-fit: cover`) to eliminate Cumulative Layout Shift (CLS).
 - **Graceful Fallback:** Every image uses `<FallbackImage />` with shimmer skeleton loading and an `onError` handler that replaces failed images with `public/images/placeholder.svg`.
-- **Verification Script:** `npm run verify:images` runs [`scripts/verify-images.mjs`](scripts/verify-images.mjs) verifying that all 36 local images exist and are non-empty files in `public/images/`.
-- See [`docs/CHALLENGES.md`](docs/CHALLENGES.md) and [`docs/IMAGE_CREDITS.md`](docs/IMAGE_CREDITS.md) for full rationale and photographer attributions.
+- **Verification:** The repository currently has no automated image verification script; `npm run build` validates the production bundle.
+- See [`docs/CHALLENGES.md`](docs/CHALLENGES.md) for implementation rationale.
 
 ---
 

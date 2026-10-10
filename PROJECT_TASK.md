@@ -201,8 +201,7 @@ Size rules: tops, knitwear, outerwear XS–XL; trousers waist 28–36; belts S/M
 - Product images: `public/images/products/<product-id-lowercase>.jpg`, e.g. `/images/products/atn-ts-001.jpg`, 4:5 ratio.
 - Site images (hero, category tiles): `public/images/site/`.
 - No remote image URLs in code or data.
-- Products without a real photo use `/images/placeholder.svg` and are listed in `docs/IMAGE_CREDITS.md` under "Images still needed". Never invent image URLs.
-- `docs/IMAGE_CREDITS.md`: filename, product, source URL, licence note, status.
+- Products without a real photo use `/images/placeholder.svg`. Never invent image URLs.
 - `npm run verify:images` runs `scripts/verify-images.mjs` and fails if any referenced file is missing.
 - Use `aspect-ratio` or width/height to avoid layout shift, and `loading="lazy"` below the fold.
 
@@ -312,7 +311,6 @@ atelier-nord/
 │   ├── TEST_CASES.md
 │   ├── CHALLENGES.md
 │   ├── IMPROVEMENTS.md
-│   ├── IMAGE_CREDITS.md
 │   └── evidence/                   # real screenshots only
 ├── .env.example
 ├── .gitignore
@@ -572,7 +570,7 @@ GTM Preview (events and fired tags); GA4 DebugView (names, parameters, user prop
 ### Website
 - [x] Exactly five routes; unknown URLs redirect to `/`.
 - [x] Categories, filters, sale view, sorting and search work, driven by the URL.
-- [x] All 28 products show correct prices, discount badges and remote images (`verify:images` passes).
+- [x] All 28 products show correct prices, discount badges and local images.
 - [x] Cart add, remove and quantity changes work and survive refresh.
 - [x] Coupons behave as in section 6, and survive refresh.
 - [x] Totals match section 6.3 for every test case.
@@ -611,14 +609,14 @@ GTM Preview (events and fired tags); GA4 DebugView (names, parameters, user prop
 - [ ] Funnel exploration built; item and revenue reports checked.
 
 ### Documentation
-- [ ] README, requirements, tracking plan (three tables), test results, challenges, improvements and image credits complete.
+- [ ] README, requirements, tracking plan (three tables), test results, challenges and improvements complete.
 - [ ] Evidence saved in `docs/evidence/`.
 
 ---
 
 ## 15. Current State and Required Changes
 
-The storefront exists (Vite, React 19, plain CSS, lucide-react) with cart, checkout, order saving and pricing utilities. **No tracking exists yet**: no GTM snippet, no `dataLayer.js`, no `docs/`.
+The storefront exists (Vite, React 19, plain CSS, lucide-react) with cart, checkout, order saving, pricing utilities and local image assets. **No tracking exists yet**: no GTM snippet or `dataLayer.js`. Only `docs/CHALLENGES.md` is currently present; the remaining analytics documentation and evidence are still pending.
 
 Required refactors before tracking work:
 
@@ -627,7 +625,7 @@ Required refactors before tracking work:
 | Routes | Cut to 5; merge confirmation into `/checkout`; move category and search into `/shop` query parameters; delete Contact, Shipping & Returns, NotFound, Search, Category pages |
 | Categories | Replace the old category mix with section 5.1 |
 | Products | Replace the catalogue with section 5.3 |
-| Images | Move to local files; add placeholder, credits file and verify script |
+| Images | Local product, site and placeholder assets are present; restore the credits file and verify script |
 | Discounts | Badges, struck-through prices, sale filter, "biggest discount" sort, savings line |
 | Coupons | Data file, calculation order, `CouponInput`, order object fields, **coupon allocation function (6.4)** |
 | Orders | Stronger transaction ID, tracked-ID flag, redirect when no order |

@@ -1,6 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Bootstrap: dataLayer + user properties (runs before GTM) -->
+<script>
+  (function () {
+    window.dataLayer = window.dataLayer || [];
+    var props = { visitor_type: 'new', has_purchased: 'no', preferred_category: 'unknown', preferred_size: 'unknown' };
+    try {
+      var saved = JSON.parse(localStorage.getItem('atelier_nord_user_props') || 'null');
+      if (saved) { for (var k in props) { if (saved[k]) props[k] = saved[k]; } }
+      var visited = localStorage.getItem('atelier_nord_visited');
+      props.visitor_type = visited ? 'returning' : 'new';
+      if (!visited) localStorage.setItem('atelier_nord_visited', '1');
+      localStorage.setItem('atelier_nord_user_props', JSON.stringify(props));
+    } catch (e) {}
+    window.dataLayer.push({ user_properties: props });
+  })();
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','%VITE_GTM_ID%');</script>
+<!-- End Google Tag Manager -->
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Atelier Nord — Contemporary Scandinavian Fashion</title>
@@ -17,6 +42,8 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=%VITE_GTM_ID%"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
