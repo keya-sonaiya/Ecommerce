@@ -1,4 +1,4 @@
-# 1. Challenges Faced and Their Resolutions
+# Challenges Faced and Their Resolutions
 
 ### 1. Understanding GA4 Events and Parameters
 
@@ -23,3 +23,9 @@
 **Challenge:** I wanted to understand how information such as visitor type and preferred category could be used in GA4 reports. I initially found it confusing that sending a parameter does not automatically make it available as a reporting dimension.
 
 **Resolution:** I identified the relevant user properties and event parameters and learned how to register the appropriate custom dimensions in GA4, using the correct scope.
+
+### 5. Events Missing From a Second Browser Profile
+ 
+**Challenge:** Realtime showed only my GTM Preview session. A second profile on the live site sent nothing, even though the container was published.
+ 
+**Resolution:** The second profile used the Brave browser, whose Shields block Google Tag Manager and Google Analytics requests. The Network tab showed no `gtm.js` or `g/collect` requests. I tested in a browser without tracker blocking. This also showed me that client-side tracking under-counts visitors who use privacy tools.

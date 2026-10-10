@@ -11,3 +11,5 @@
 5. **Connecting technical implementation with business needs:** I realised that analytics is not just about collecting events. It should help answer practical questions about customer behaviour, product interactions, and the checkout process.
 
 6. **Learning a new technology:** Working on this project helped me become more comfortable learning unfamiliar tools by understanding their concepts, implementing the configuration, and testing the results.
+
+7. **Real-world limits of tracking:** Ad blockers and privacy browsers can stop client-side tags, standard reports lag behind DebugView, and a browser-storage guard cannot stop duplicates across devices. These limits belong in the documentation, and they point to future improvements such as consent handling and server-side tagging.
