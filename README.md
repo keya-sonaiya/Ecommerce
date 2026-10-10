@@ -1,200 +1,122 @@
-# ATELIER NORD — Scandinavian Minimalist Fashion E-commerce
+# Atelier Nord
 
-> **Atelier Nord** is a complete, contemporary fashion e-commerce web application inspired by Nordic minimalism and high-editorial fashion layouts. Built with modern React 19, Vite 6, React Router DOM, and clean CSS variables.
+Atelier Nord is a fictional Scandinavian-fashion e-commerce demo built for the Tatvic Technical Analyst (Data Collection) assessment. It pairs a five-route React storefront with a Google Tag Manager (GTM) and GA4 data-layer implementation.
 
----
+The primary project requirements and tracking specification live in [PROJECT_TASK.md](PROJECT_TASK.md).
 
-## 1. Technology Stack
+## Features
 
-- **Framework:** React 19 (JavaScript & JSX)
-- **Build Tool:** Vite 6
-- **Routing:** React Router DOM (v7) with HTML5 History API (strictly 5 routes + catch-all redirect to `/`)
-- **State Management:** React Context API + `useReducer` for deterministic cart and order actions
-- **Persistence:** Safe `localStorage` integration with JSON parsing fallbacks and corrupt data recovery (`atelier_nord_cart`, `atelier_nord_completed_order`)
-- **Styling:** Vanilla CSS with custom design tokens (CSS variables), responsive typography, and mobile-first layout rules
-- **Icons:** `lucide-react`
-- **Typography:** Google Fonts (*Cormorant Garamond* editorial serif headers and *Inter* clean sans-serif body)
+- Five client-side routes: Home, Shop, Product Detail, Cart, and Checkout/Confirmation.
+- A 28-item local product catalogue with category, sale, sort, and URL-driven search views.
+- Variant selection, cart persistence, quantity changes, coupons, free-shipping progress, and simulated checkout.
+- Local product and editorial imagery with image fallbacks.
+- Coupon allocation across items for GA4-consistent checkout and purchase values.
+- A shared analytics module at `src/analytics/dataLayer.js`; UI components call named helpers and never push directly to `window.dataLayer`.
 
----
+## Stack
 
-## 2. Quick Start & Development
+- React 19 and Vite 6
+- React Router 7
+- React Context and `useReducer` for cart state
+- Plain CSS and `lucide-react`
+- Browser `localStorage` for cart, order, purchase-deduplication, and user-property state
+- Google Tag Manager and GA4 (configuration required outside this repository)
 
-### Prerequisites
-- Node.js `v18+` (tested on Node `v24.12.0`)
-- npm `v9+` (tested on npm `11.12.1`)
+## Run locally
 
-### Installation & Execution
+Prerequisites: Node.js 18 or newer and npm.
+
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Start the local Vite development server
 npm run dev
-
-# The development server runs by default on http://localhost:3000
 ```
 
-### Production Build & Preview
-```bash
-# 3. Create an optimized production build
-npm run build
+Vite serves the app at [http://localhost:3000](http://localhost:3000). If PowerShell blocks `npm.ps1`, use `npm.cmd run dev` instead.
 
-# 4. Preview the production build locally
+Create a local `.env` file from `.env.example` before testing GTM:
+
+```env
+VITE_GTM_ID=GTM-XXXXXXXX
+```
+
+`VITE_GTM_ID` is compiled into the client bundle, so restart the development server after changing it. Never commit `.env`.
+
+## Build and checks
+
+```bash
+npm run build
 npm run preview
-# Serves the compiled dist/ directory at http://localhost:4173
 ```
 
-### Verification
+No automated pricing or image-verification script is currently provided. Restore the planned checks under `scripts/` and add their npm commands before treating the assessment test suite as complete.
 
-The current repository does not include automated image or pricing verification scripts. Use
-`npm run build` as the available production validation command until those checks are restored.
+## Routes
 
-### Deploy to Vercel
+| Route | Purpose |
+|---|---|
+| `/` | Hero, category links, featured products, and bestsellers |
+| `/shop` | Catalogue with `category`, `sale`, `q`, `sort`, and price query parameters |
+| `/product/:id` | Product information, variants, quantity, and add-to-bag action |
+| `/cart` | Bag contents, coupon entry, shipping progress, and order summary |
+| `/checkout` | Details, shipping, payment, review, and confirmation on one route |
 
-The project is configured for Vercel with a React Router SPA rewrite in `vercel.json`.
+Unknown routes redirect to `/`. The checkout confirmation is deliberately a step on `/checkout`, not a sixth route.
 
-#### Vercel Dashboard
+## Analytics implementation
 
-1. Push the project to a GitHub repository.
-2. Import the repository in Vercel.
-3. Select **Vite** as the framework preset.
-4. Use `npm run build` as the build command.
-5. Use `dist` as the output directory.
-6. Leave the root directory as `.` and deploy.
+`src/analytics/dataLayer.js` owns all application data-layer pushes. It provides helpers for GA4-recommended e-commerce events, custom events, user properties, item mapping, coupon-safe values, and purchase deduplication.
 
-#### Vercel CLI
+Implemented tracking includes:
 
-```bash
-npm install
-npm run build
-npx vercel --prod
-```
+- Product and cart events: `view_item_list`, `select_item`, `view_item`, `add_to_cart`, `remove_from_cart`, and `view_cart`.
+- Checkout events: `begin_checkout`, `add_shipping_info`, `add_payment_info`, and a transaction-ID-deduplicated `purchase`.
+- Supporting events: `search`, `filter_products`, `sort_products`, `select_variant`, `update_cart_quantity`, `apply_coupon`, `coupon_error`, `checkout_error`, `select_shipping_method`, `click_cta`, and `free_shipping_unlocked`.
+- First-load user-property bootstrap in `index.html`, plus route-change page views through `RouteTracker` and `virtual_page_view`.
 
-No environment variables are required by the current demo application.
+The app deliberately avoids sending customer names, email addresses, phones, or addresses. Coupon codes are emitted only for known demo codes; search terms are normalised and rejected when they resemble an email address or phone number.
 
----
+### GTM and GA4 setup
 
-## 3. Project Structure
+This repository installs the GTM bootstrap snippet, but GTM and GA4 still require manual configuration:
 
-```text
-atelier-nord/
-├── docs/
-│   ├── CHALLENGES.md           # Engineering challenges, decisions, and mitigations
-├── public/
-│   ├── images/
-│   │   ├── products/            # Local product photography
-│   │   ├── site/                # Local hero and category photography
-│   │   └── placeholder.svg      # Brand ivory/taupe vector fallback placeholder
-│   └── favicon.svg             # Minimalist AN monogram favicon
-├── src/
-│   ├── components/
-│   │   ├── cart/
-│   │   │   ├── CartItem.jsx & CartItem.css
-│   │   │   ├── CouponInput.jsx & CouponInput.css
-│   │   │   └── FreeShippingMeter.jsx & FreeShippingMeter.css
-│   │   ├── common/
-│   │   │   ├── AnnouncementBar.jsx & AnnouncementBar.css
-│   │   │   ├── FallbackImage.jsx
-│   │   │   ├── Footer.jsx & Footer.css
-│   │   │   ├── Header.jsx & Header.css
-│   │   │   └── ScrollToTop.jsx
-│   │   └── product/
-│   │       ├── ProductCard.jsx & ProductCard.css
-│   │       ├── ProductGrid.jsx & ProductGrid.css
-│   │       └── QuantitySelector.jsx & QuantitySelector.css
-│   ├── context/
-│   │   ├── CartContext.jsx      # Provider exposing state, actions, and order completion
-│   │   └── cartReducer.js      # Pure reducer handling all cart operations
-│   ├── data/
-│   │   ├── categories.js       # The 6 official categories + accessory subcategories
-│   │   ├── coupons.js          # WELCOME10, NORD500, FREESHIP
-│   │   ├── productImages.js    # Single source mapping 28 product IDs to local 4:5 paths
-│   │   ├── products.js         # Single source of truth: 28 products with permanent IDs
-│   │   └── siteImages.js        # Hero, editorial, and category tile local paths
-│   ├── hooks/
-│   │   └── useDocumentTitle.js # Centralized document.title updater
-│   ├── pages/
-│   │   ├── Cart.jsx & Cart.css
-│   │   ├── Checkout.jsx & Checkout.css
-│   │   ├── Home.jsx & Home.css
-│   │   ├── ProductDetail.jsx & ProductDetail.css
-│   │   └── Shop.jsx & Shop.css
-│   ├── styles/
-│   │   ├── global.css          # CSS reset, typography, and utility classes
-│   │   └── variables.css       # Design tokens (colors, spacing, elevations, transitions)
-│   ├── utils/
-│   │   ├── formatPrice.js      # INR currency formatter (Intl.NumberFormat)
-│   │   ├── itemMapper.js       # Line key generator and normalized item mapper
-│   │   ├── orderGenerator.js   # ATN-YYYYMMDD-<6+ char suffix> generator & order builder
-│   │   ├── pricing.js          # Exact calculation order & coupon allocation engine
-│   │   └── storage.js          # Safe localStorage get/set/remove abstractions
-│   ├── App.jsx                 # Exact 5 routes definition + catch-all redirect
-│   └── main.jsx                # Application root entrypoint
-├── vercel.json                 # Single host SPA rewrite configuration (/(.*) -> /index.html)
-├── vite.config.js              # Vite server and React plugin config
-├── .env.example                # Example environment file
-├── .gitignore                  # Git ignore rules
-├── package.json
-└── README.md
-```
+1. Create one GTM Web container and set `VITE_GTM_ID` locally and in the deployment environment.
+2. Configure the Google tag for the initial page view and attach the four user properties.
+3. Add Custom Event triggers and GA4 Event tags for the data-layer event names in [PROJECT_TASK.md](PROJECT_TASK.md).
+4. Configure GA4 with India Standard Time and INR; disable browser-history page changes and enhanced-measurement site search.
+5. Register the required custom dimensions before the final test pass.
+6. Validate the full journey in GTM Preview and GA4 DebugView before publishing the container.
 
----
+Do not claim analytics is verified until the manual GTM Preview and DebugView checks have been completed and real evidence is saved.
 
-## 4. Key Routes & Features
+## Data and pricing
 
-The application strictly implements **exactly 5 client-side routes** (unknown paths automatically redirect to `/`):
+Products, categories, coupons, and image paths are local JavaScript data sources under `src/data`. Price calculations are centralised in `src/utils/pricing.js`.
 
-| Route | Page | Key Functionality & Experience |
-|---|---|---|
-| `/` | **Home** | Editorial hero showcase with two CTAs, 6 image-led category gateways, curated featured pieces, and studio bestsellers. |
-| `/shop` | **Shop / Catalog** | Full 28-product catalog driven entirely by URL query parameters (`?category=`, `?sale=1`, `?q=`, `?sort=`). Supports multi-category filters, sale filter, search across names/subcategories, sorting (`Featured`, `Price: Low-High`, `Price: High-Low`, `Biggest Discount`, `Newest`), and graceful invalid-category recovery banner. |
-| `/product/:id` | **Product Details** | High-resolution 4:5 photography with fallback handling, stock status badges (`In stock`, `Only N left`), interactive size and colour selectors, quantity stepper, accordion care notes, and related pieces. |
-| `/cart` | **Shopping Bag** | Variant separation (independent lines per size/color), quantity increment/decrement, line removal, interactive free shipping progress bar towards the ₹2,999 threshold, shared `<CouponInput />`, auto-removal notice if subtotal drops below coupon minimum, and complete breakdown. |
-| `/checkout` | **Checkout & Confirmation** | Multi-step journey on a single route: (1) Details (form validation with auto-focus on first invalid input); (2) Shipping Tier (Standard ₹99 / free vs Express ₹199); (3) Payment (Card, UPI, COD simulated); (4) Order Review with `<CouponInput />`; (5) Order Confirmation rendered directly on `/checkout` from saved order in `localStorage` (`ATN-YYYYMMDD-<suffix>`). Direct visits to `/checkout` with an empty cart and no saved order redirect to `/cart`; visits with a saved order show the confirmation, allowing full page refreshes. |
+Supported demo coupons are:
 
----
+- `WELCOME10`: 10% off, capped at ₹500, with a ₹1,500 minimum subtotal.
+- `NORD500`: ₹500 off a ₹4,000 minimum subtotal.
+- `FREESHIP`: standard-shipping waiver.
 
-## 5. Pricing, Discount and Coupon Rules
+Coupon allocation is used only for analytics checkout and purchase item values. It does not change the shelf prices or customer-facing totals.
 
-All calculations are encapsulated in [`src/utils/pricing.js`](src/utils/pricing.js) and adhere strictly to Section 6.3 of the specification:
+## Deployment
 
-1. **Items Subtotal:** Sum of (`finalUnitPrice × quantity`)
-2. **Coupon Discount:** Calculated from items subtotal, capped at items subtotal (0 for `FREESHIP`)
-3. **Discounted Subtotal:** `itemsSubtotal − couponDiscount`
-4. **Shipping Fee:** Free if `discountedSubtotal >= 2999` or when `FREESHIP` coupon is applied; otherwise ₹99 Standard or ₹199 Express.
-5. **Tax (GST):** `Math.round(5% of discountedSubtotal)`
-6. **Total Order Amount:** `discountedSubtotal + shipping + tax`
+The project includes [vercel.json](vercel.json), which rewrites all paths to `index.html` so React Router refreshes work after deployment.
 
-### Available Coupons (`src/data/coupons.js`)
-- `WELCOME10`: 10% off (up to ₹500 discount), minimum subtotal ₹1,500.
-- `NORD500`: Flat ₹500 off, minimum subtotal ₹4,000.
-- `FREESHIP`: Waives standard delivery fee (₹99), minimum subtotal ₹0. (No effect on Express shipping).
+For Vercel, use `npm run build` and publish the `dist` directory. Set `VITE_GTM_ID` in the project environment before deploying. A live deployment URL has not yet been recorded.
 
-### Coupon Allocation Across Items (`allocateCouponAcrossItems`)
-Allocates order-level discounts proportionally across line items to prepare for analytics reconciliation (Section 6.4):
-- Per-line share: `couponDiscount × lineTotal / itemsSubtotal` rounded to 2 decimal places.
-- Rounding remainder is absorbed by the last line item, ensuring $\sum \text{paidUnitPrice} \times \text{quantity} = \text{discountedSubtotal}$.
+## Documentation and test evidence
 
----
+The project keeps only these deliverables:
 
-## 6. Local Images Architecture & Mitigation Strategy
+- [Tracking plan](docs/TRACKING_PLAN.md)
+- [Test cases](docs/TEST_CASES.md)
+- [Challenges log](docs/CHALLENGES.md)
+- Real GTM Preview and GA4 DebugView screenshots in `docs/evidence/` after testing
 
-In strict adherence to PROJECT_TASK.md Section 5.4, all images are stored and served locally from the `public/images/` directory:
-- **Local Directory Layout:**
-  - Product images: `public/images/products/<product-id-lowercase>.jpg` (all 28 products)
-  - Site & category images: `public/images/site/` (`hero.jpg`, `editorial.jpg`, and 6 category banners)
-  - Vector fallback: `public/images/placeholder.svg`
-- **Centralized Mapping:** [`src/data/productImages.js`](src/data/productImages.js) and [`src/data/siteImages.js`](src/data/siteImages.js) provide clean centralized mapping functions.
-- **Aspect Ratio & Layout Stability:** Every image container enforces a fixed 4:5 ratio (`aspect-ratio: 4/5; object-fit: cover`) to eliminate Cumulative Layout Shift (CLS).
-- **Graceful Fallback:** Every image uses `<FallbackImage />` with shimmer skeleton loading and an `onError` handler that replaces failed images with `public/images/placeholder.svg`.
-- **Verification:** The repository currently has no automated image verification script; `npm run build` validates the production bundle.
-- See [`docs/CHALLENGES.md`](docs/CHALLENGES.md) for implementation rationale.
+The live website URL and validation screenshots are pending; no placeholder evidence is committed.
 
----
+## AI assistance
 
-## 7. Assumptions & Deliberate Decisions
-
-1. **Fictional Brand:** Atelier Nord is an editorial design demo. No actual payment gateway or real financial transactions are executed.
-2. **Demo Checkout:** Step 3 of checkout clearly indicates demo mode; customers select either "Credit / Debit Card (Simulated)", "UPI / NetBanking (Simulated)", or "Cash on Delivery", requiring no real sensitive credentials.
-3. **5-Route Architecture:** Order confirmation is the final step of `/checkout`, rendering from `localStorage`, ensuring full page refreshes work smoothly without creating a 6th route.
-4. **Phase A Scope:** In accordance with the project requirements, tracking code (GTM, dataLayer, GA4) is excluded in this phase and will be added cleanly in Phase B.
+AI assistance was used for implementation support and documentation drafts. Analytics must still be manually validated in GTM Preview and GA4 DebugView before being presented as verified.

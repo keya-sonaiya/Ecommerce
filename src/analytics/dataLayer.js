@@ -175,13 +175,13 @@ export function trackPurchase(order) {
     color: it.variant?.color,
   }));
   const { items, params } = checkoutPayload(lines, order);
+  setUserProperties({ has_purchased: 'yes' });
   pushEcommerce(
     'purchase',
     { transaction_id: order.id, ...params, tax: order.tax, shipping: order.shipping },
     items
   );
   setToStorage(TRACKED_KEY, [...tracked, order.id].slice(-50));
-  setUserProperties({ has_purchased: 'yes' });
   return true;
 }
 
@@ -222,10 +222,8 @@ export const trackApplyCoupon = (code, discount_amount) => {
 
 // error_reason: 'invalid' | 'minimum_not_met' | 'empty'
 export const trackCouponError = (rawCode, error_reason) => {
-  const payload = { event: 'coupon_error', error_reason };
   const known = getCoupon(rawCode)?.code; // raw text is never sent
-  if (known) payload.coupon_code = known;
-  push(payload);
+  push({ event: 'coupon_error', error_reason, coupon_code: known || undefined });
 };
 
 export const trackCheckoutError = (error_field, checkout_step) =>

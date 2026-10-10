@@ -30,7 +30,7 @@ import {
 import './Checkout.css';
 
 export function Checkout() {
-  useDocumentTitle('Simulated Checkout — Atelier Nord');
+  useDocumentTitle('Checkout');
 
   const {
     cart,

@@ -86,7 +86,7 @@ export function Shop() {
     return 'The Collection';
   }, [matchedCategory, saleParam, queryParam, isInvalidCategory]);
 
-  useDocumentTitle(`${pageTitle} — Atelier Nord`);
+  useDocumentTitle(pageTitle);
 
   // Filtered & Sorted Product List
   const filteredProducts = useMemo(() => {
