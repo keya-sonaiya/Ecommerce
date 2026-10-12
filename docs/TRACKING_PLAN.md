@@ -12,7 +12,7 @@ Atelier Nord sends website interaction data from its React application to `windo
 
 | Event | When it is triggered | Parameters sent |
 |---|---|---|
-| `page_view` | Initial page load and React route changes | `page_location`, `page_title`, `page_path` |
+| `page_view` | Initial page load and React route changes | `page_location`, `page_title` |
 | `view_item_list` | A product list is displayed | `item_list_id`, `item_list_name`, `items` |
 | `select_item` | A product is selected from a list | `item_list_id`, `item_list_name`, `items` |
 | `view_item` | A product detail page is viewed | `currency`, `value`, `items` |
@@ -26,6 +26,8 @@ Atelier Nord sends website interaction data from its React application to `windo
 | `search` | An allowed, non-empty product search is submitted | `search_term` |
 
 **Page views:** The React route tracker pushes `virtual_page_view`; GTM maps this to the GA4 `page_view` event. The initial page view is sent by the Google tag. Browser-history page-view tracking is disabled to avoid overlapping page views.
+
+**`page_location` limitation:** `page_location` is the complete browser URL. On the shop route it can therefore include the `?q=` search query. The sanitised `search` event does not alter that URL, so visitors must not enter personal information in the on-site search box. This demo does not strip `q` from `page_location`.
 
 ## 3. Custom events
 
@@ -96,9 +98,6 @@ Custom dimensions make selected event parameters and user properties available f
 | Event | `sort_option` |
 | Event | `variant_type` |
 | Event | `variant_value` |
-| Event | `item_id` |
-| Event | `direction` |
-| Event | `quantity_after` |
 | Event | `coupon_code` |
 | Event | `error_reason` |
 | Event | `error_field` |

@@ -1,16 +1,38 @@
 # Atelier Nord
 
-Atelier Nord is a fictional Scandinavian-fashion storefront built for the Tatvic Technical Analyst (Data Collection) assessment. It is a client-side React application with a local catalogue, persistent cart, simulated checkout, and Google Tag Manager (GTM) / Google Analytics 4 (GA4) tracking.
+Atelier Nord is a fictional Scandinavian-fashion storefront. It is a client-side React application with a local catalogue, persistent cart, simulated checkout, and Google Tag Manager (GTM) / Google Analytics 4 (GA4) tracking.
 
 **Live deployment:** [ecommerce-26-ivory.vercel.app](https://ecommerce-26-ivory.vercel.app/)
 
-## Highlights
+## At a glance
 
-- 28 locally sourced catalogue items across T-Shirts, Shirts, Trousers, Outerwear, Knitwear, and Accessories.
-- Product variants, persistent cart state, quantity editing, shipping progress, and three demo coupon codes.
-- Simulated multi-step checkout with transaction-ID purchase deduplication; no real payment details are collected.
-- Responsive, accessible React interface with local product and editorial imagery.
-- GA4 e-commerce, product-discovery, checkout, and custom interaction tracking through one shared data-layer module.
+| Area | What is included |
+| --- | --- |
+| Storefront | Five responsive React routes for discovery, product details, bag, and checkout |
+| Catalogue | 28 local products across six fashion categories, with variants and sale pricing |
+| Shopping | Persistent bag, quantity updates, shipping progress, and three demo coupon codes |
+| Measurement | GTM and GA4 coverage for discovery, e-commerce, checkout, and supporting interactions |
+| Delivery | Vite development/build workflow and a Vercel SPA deployment configuration |
+
+## Shopper journey
+
+| Stage | Visitor experience | Key measurement |
+| --- | --- | --- |
+| Discover | Browse the home page, categories, sales, search, and filters | `view_item_list`, `search`, `filter_products`, `sort_products` |
+| Consider | Open a product and select its size or colour | `select_item`, `view_item`, `select_variant` |
+| Build a bag | Add, remove, or adjust items; apply a coupon | `add_to_cart`, `remove_from_cart`, `view_cart`, coupon events |
+| Checkout | Confirm shipping and payment choices through the simulated checkout | `begin_checkout`, `add_shipping_info`, `add_payment_info` |
+| Complete | Review the order and receive a local confirmation | Deduplicated `purchase` event |
+
+```mermaid
+flowchart LR
+  A[Discover] -->|view_item_list| B[Product list]
+  B -->|select_item| C[Product detail]
+  C -->|view_item and add_to_cart| D[Shopping bag]
+  D -->|view_cart and begin_checkout| E[Checkout]
+  E -->|shipping and payment events| F[Order review]
+  F -->|purchase| G[Confirmation]
+```
 
 ## Tech stack
 
@@ -74,6 +96,10 @@ npm run preview
 
 The project currently has no automated test scripts. Validate the shopping and tracking flows described in the documentation before a release.
 
+### Validation status
+
+The supplied evidence shows GTM Preview firing the page, product, cart, checkout, purchase, and supporting interaction tags during a representative journey. GA4 DebugView captures confirm received page-view, e-commerce, custom-event, purchase-parameter, and user-property data. See [validation screenshots](docs/Screenshots) for the recorded captures.
+
 ## Routes and catalogue controls
 
 | Route | Purpose |
@@ -103,6 +129,15 @@ Standard shipping is free from an INR 2,999 discounted subtotal; otherwise it co
 ## Analytics
 
 Application code sends all tracking through [`src/analytics/dataLayer.js`](src/analytics/dataLayer.js). Components call named helpers rather than writing to `window.dataLayer` directly. Each e-commerce event first clears the previous `ecommerce` object, includes INR currency where relevant, and never sends an empty `items` array.
+
+```mermaid
+flowchart LR
+  A[React interaction] --> B[Named data-layer helper]
+  B --> C[window.dataLayer]
+  C --> D[GTM custom-event trigger]
+  D --> E[GA4 event and user properties]
+  E --> F[DebugView and reports]
+```
 
 Implemented recommended events include `view_item_list`, `select_item`, `view_item`, `add_to_cart`, `remove_from_cart`, `view_cart`, `begin_checkout`, `add_shipping_info`, `add_payment_info`, `purchase`, and `search`. Supporting custom events cover virtual page views, filtering, sorting, variant selection, cart quantity changes, coupon outcomes, checkout errors, shipping selection, CTA clicks, and free-shipping progress.
 

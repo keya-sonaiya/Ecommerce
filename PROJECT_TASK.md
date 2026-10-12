@@ -61,7 +61,8 @@ Shop filters are URL-driven and use these query parameters:
 - `category`
 - `sale`
 - `q`
-- `sort` (`price-asc`, `price-desc`, `discount`, or `newest`)
+- `price` (`under-1500`, `1500-3000`, or `above-3000`)
+- `sort` (`price-asc`, `price-desc`, `discount-desc`, or `newest`)
 
 Invalid category values must fall back to all products without crashing. Search matches product name, category, and accessory subcategory.
 
